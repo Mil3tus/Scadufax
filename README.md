@@ -1,10 +1,10 @@
-# Scadufax Network Scanner
+#### Scadufax Network Scanner
 This is a network scanner based on Scapy created in Python 3.11.2
 
-## The Objective
+##### The Objective
 This project was started only for study proposes.
 
-## Required Libraries
+##### Required Libraries
 * termcolor
 * time
 * datetime
@@ -16,8 +16,8 @@ This project was started only for study proposes.
 * os
 * argparse
 
-## Help Menu
--h, --help            show this help message and exit
+##### Help Menu
+**-h, --help**            show this help message and exit
 -s                    scan tcp/syn mode [no Proxychains / Sudo required]
 -t                    three way handshake scan mode
 -d 192.168.0.1        single target

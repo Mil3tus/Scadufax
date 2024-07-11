@@ -1,5 +1,5 @@
 # network module
-# created by Tales Braganca
+# created by H1d0raKai
 
 # required libraries syn scan function
 from logging import getLogger, ERROR # import logging things

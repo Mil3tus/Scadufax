@@ -22,9 +22,6 @@ import datetime
 
 #---------------------------------------------------------
 
-
-# VERIFICAR DEPOIS KEYBOARD INTERRUPT !!!!!!
-
 # task calc until the end of execution
 def calc_task(request_timeout, interval_request, address_pool, port_pool):
     # plus time unit (request_timeout + interval_request)

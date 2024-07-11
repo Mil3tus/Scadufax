@@ -12,9 +12,7 @@ import socket
 # hide scapy output
 conf.verb = 0
 
-### IMPORTANTE
-### CONSULTAR ANTES DE CONTINUAR O CODIGO
-# https://www.infosecinstitute.com/resources/hacking/port-scanning-using-scapy/
+
 def send_syn_packet(source_address, target_address, source_port, destination_port, syn_timeout):
         start_runtime = time.time()
         syn_scan_packet = sr1(IP(src = source_address, dst = target_address)/TCP(sport = source_port,

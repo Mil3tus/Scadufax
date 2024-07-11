@@ -1,5 +1,5 @@
 # scadufax scanner
-# created by Tales Braganca - 2024
+# created by H1d0raKai - 2024
 
 # required libraries
 import argparse

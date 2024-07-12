@@ -114,6 +114,14 @@ def printf_open(port_address, port_service):
     print (colored('open', 'green'), end='')
     print ('\t' + str(port_service))
 
+# show open port message
+def printf_openf(port_address, port_service):
+    print ('\t', end='')
+    print (colored('-', 'white', attrs=['bold']), end='')
+    print (' ' + str(port_address) + '/tcp\t', end='')
+    print (colored('open', 'magenta'), end='')
+    print ('\t' + str(port_service))
+
 # show filtered port message
 def printf_filtered(port_address, port_service):
     print ('\t', end='')
@@ -162,3 +170,41 @@ def program_usage(error_message):
         print ('')
     else:
         print ('error: ' + error_message)
+
+# generate service from port number
+def generate_service(port_number, protocol):
+    # verify protocol
+    if (protocol == 'tcp'):
+        try:
+            # try to open database file
+            with open('../database/tcp.csv') as tcp_content:
+                # read line by line
+                for tcp_line in tcp_content:
+                    # create port standard for compare
+                    check_port = ',' + str(port_number) + ','
+                    if check_port in tcp_line:
+                        # if port found, extract services from line
+                        checked_line = tcp_line.lower()
+                        explode_line = checked_line.split('"',)
+                        generated_service = explode_line[3]
+                        return generated_service
+        except Exception as e:
+            print (e)
+            sys.exit()
+    elif (protocol == 'udp'):
+        try:
+            # try to open database file
+            with open('../database/udp.csv') as udp_content:
+                # read line by line
+                for udp_line in udp_content:
+                    # create port standard for compare
+                    check_port = ',' + str(port_number) + ','
+                    if check_port in udp_line:
+                        # if port found, extract services from line
+                        checked_line = udp_line.lower()
+                        explode_line = checked_line.split('"',)
+                        generated_service = explode_line[3]
+                        return generated_service
+        except Exception as e:
+            print (e)
+            sys.exit()

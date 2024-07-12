@@ -13,44 +13,6 @@ from iostream import *
 # hide scapy output
 conf.verb = 0
 
-# send packet with flag function
-def send_syn_packet(source_address, target_address, source_port, destination_port, syn_timeout):
-        start_runtime = time.time()
-        syn_scan_packet = sr1(IP(src = source_address, dst = target_address)/TCP(sport = source_port,
-        dport = int(destination_port), flags = "S"), timeout = syn_timeout) # built SYN packet
-        try:
-            # send packet
-            syn_packet_code = syn_scan_packet.getlayer(TCP)
-            # received a SYN/ACK packet from request
-            if 'SA' in str(syn_packet_code):
-                # get the service identified on packet
-                convert_syn_packet = str(syn_packet_code)
-                explode_syn_packet_code = convert_syn_packet.split(':',)
-                generate_service_name = explode_syn_packet_code[1].split('>',)
-                generated_service = generate_service_name[0].strip()
-                # return service name or not
-                if (generated_service == str(destination_port)):
-                    return str(destination_port), 'open', 'unkown service'
-                else:
-                    return str(destination_port), 'open', str(generated_service).strip()
-            # received a RST/ACK packet from request
-            elif 'RA' in str(syn_packet_code):
-                # get the service identified on packet
-                convert_syn_packet = str(syn_packet_code)
-                explode_syn_packet_code = convert_syn_packet.split(':',)
-                generate_service_name = explode_syn_packet_code[1].split('>',)
-                generated_service = generate_service_name[0].strip()
-                if (generated_service == str(destination_port)):
-                    return str(destination_port), 'closed', 'unkown service'
-                else:
-                    return str(destination_port), 'closed', str(generated_service).strip()
-        except Exception as e:
-            end_runtime = time.time() - start_runtime
-            if (int(end_runtime) >= syn_timeout):
-                return str(destination_port), 'filtered', 'unkown service'
-            else:
-                pass
-
 # send ICMP packet in order to show if host is alive or not
 def icmp_send_packet(target_address, icmp_timeout):
     icmp_packet = sr1(IP(dst = target_address)/ICMP(), timeout = icmp_timeout)
@@ -133,7 +95,7 @@ def send_flag_prototype(source_address, target_address, source_port, destination
                 # generate service from port number
                 packet_service = generate_service(destination_port, 'tcp')
                 # return information with port number, status and service description
-                return str(destination_port), 'filter', str(packet_service)
+                return str(destination_port), 'filtered', str(packet_service)
             else:
                 print (e)
     # FIN scan code
@@ -196,3 +158,7 @@ def send_flag_prototype(source_address, target_address, source_port, destination
                 return str(destination_port), 'open/f', str(packet_service)
             else:
                 print (e)
+
+
+#pacote = send_flag_prototype(None, '192.168.0.1', 6762, 22, 5, 'S')
+#print (pacote)

@@ -5,6 +5,7 @@
 from termcolor import colored
 import time
 import datetime
+import sys
 
 #---------------------------------------------------------
 # term color example
@@ -177,7 +178,7 @@ def generate_service(port_number, protocol):
     if (protocol == 'tcp'):
         try:
             # try to open database file
-            with open('../database/tcp.csv') as tcp_content:
+            with open('database/tcp.csv') as tcp_content:
                 # read line by line
                 for tcp_line in tcp_content:
                     # create port standard for compare
@@ -194,7 +195,7 @@ def generate_service(port_number, protocol):
     elif (protocol == 'udp'):
         try:
             # try to open database file
-            with open('../database/udp.csv') as udp_content:
+            with open('database/udp.csv') as udp_content:
                 # read line by line
                 for udp_line in udp_content:
                     # create port standard for compare

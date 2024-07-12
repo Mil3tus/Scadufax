@@ -20,7 +20,7 @@ sys.setrecursionlimit(16323056)
 
 
 # syn tcp scan target only (192.168.0.1)
-def syn_scan_single(single_target_address):
+def flag_scan_single(single_target_address):
     scadufax_banner()
     # configure other settings before scan
     if (args.script != None):
@@ -83,9 +83,13 @@ def syn_scan_single(single_target_address):
                 time.sleep(int(interval_request))
                 destination_port = int(destination_port_address[port_addr])
 
-                # syn packet request
-                packet_status = send_syn_packet(source_ip_address, str(single_target_address), int(source_port_address),
-                int(destination_port_address[port_addr]), int(request_timeout))
+                # send packet with flags
+                if (args.flag_scanner == 'X'):
+                    packet_status = send_flag_prototype(source_ip_address, str(single_target_address), int(source_port_address),
+                    int(destination_port_address[port_addr]), int(request_timeout), 'FPU')
+                else:
+                    packet_status = send_flag_prototype(source_ip_address, str(single_target_address), int(source_port_address),
+                    int(destination_port_address[port_addr]), int(request_timeout), str(args.flag_scanner))
             
                 # check packet status values
                 if (packet_status != None):
@@ -104,12 +108,14 @@ def syn_scan_single(single_target_address):
                             printf_closed(packet_port_number, packet_port_service)
                     elif (packet_status[1].strip() == 'filtered'):
                         printf_filtered(packet_port_number, packet_port_service)
+                    elif (packet_status[1].strip() == 'open/f'):
+                        printf_openf(packet_port_number, packet_port_service)
                     else:
                         pass
         print ('\n')
 
 # syn tcp scan range of addresses (192.168.0.1-192.168.0.254)
-def syn_scan_multiple(scan_from, scan_to):
+def flag_scan_multiple(scan_from, scan_to):
     # configure other settings before scan
     if (args.script != None):
         program_usage('--script flag cant be used with syn/tcp scan mode')
@@ -174,10 +180,14 @@ def syn_scan_multiple(scan_from, scan_to):
                 for port_addr in range(0, len(destination_port_address)):
                     target_address = str(range_target_address[ip_addr])
                     destination_port = int(destination_port_address[port_addr])
-
-                    # syn packet request
-                    packet_status = send_syn_packet(source_ip_address, str(range_target_address[ip_addr]), int(source_port_address),
-                    int(destination_port_address[port_addr]), int(request_timeout))
+                    # send packet with flags
+                    
+                    if (args.flag_scanner == 'X'):
+                        packet_status = send_flag_prototype(source_ip_address, str(range_target_address[ip_addr]), int(source_port_address),
+                    int(destination_port_address[port_addr]), int(request_timeout), 'FPU')
+                    else:
+                        packet_status = send_flag_prototype(source_ip_address, str(range_target_address[ip_addr]), int(source_port_address),
+                    int(destination_port_address[port_addr]), int(request_timeout), str(args.flag_scanner))
                 
                     # check packet status values
                     if (packet_status != None):
@@ -205,6 +215,11 @@ def syn_scan_multiple(scan_from, scan_to):
                                 printf_target(str(range_target_address[ip_addr]))
                                 multiple_targets_interrupter = False
                             printf_filtered(packet_port_number, packet_port_service)
+                        elif (packet_status[1].strip() == 'open/f'):
+                            if (multiple_targets_interrupter == True):
+                                printf_target(str(range_target_address[ip_addr]))
+                                multiple_targets_interrupter = False
+                            printf_openf(packet_port_number, packet_port_service)
                         else:
                             pass
         print ('\n')
@@ -291,12 +306,10 @@ def tcp_scan_single(single_target_address):
     print ('\n')
 
 
-
-
 # second layer of parameters reading
 def first_layer():
     # syn scanner selected
-    if (args.syn_scanner == True):
+    if (args.flag_scanner != None):
         # multiple targets selected
         if (args.R != None):
             try:
@@ -313,7 +326,7 @@ def first_layer():
                     program_usage('invalid ip address')
                 else:
                     # ip address ok, start scan
-                    syn_scan_multiple(scan_from, scan_to)
+                    flag_scan_multiple(scan_from, scan_to)
             except:
                 # wrong value passed
                 program_usage('unrecognized arguments')
@@ -325,7 +338,7 @@ def first_layer():
                 program_usage('invalid ip address')
             else:
                 # ip address ok, start scan
-                syn_scan_single(single_target_address)
+                flag_scan_single(single_target_address)
 
     # three way handshake selected
     elif (args.tcp_scanner == True):
@@ -339,8 +352,6 @@ def first_layer():
                 program_usage('invalid ip address')
             else:
                 tcp_scan_single(single_target_address)
-        
-
 
 # main function
 def main():
@@ -366,15 +377,16 @@ def main():
     global attack_script
     global output_file
     global open_only
+    global scan_type
 
     # set variables
     top_ports_default_scanner = '21,22,23,25,53,80,135,137,139,443,445,3306,8080'
-
+    scan_type = ['S', 'N', 'F', 'X']
 
     # parse code for execution options
     parser = argparse.ArgumentParser(description='Scadufax Network Scanner')
-    parser.add_argument('-s', dest='syn_scanner', action='store_true',
-                        help='scan tcp/syn mode [no Proxychains / Sudo required]')
+    parser.add_argument('-s', dest='flag_scanner', metavar='S,N,F or X', type=str,
+                        help='[S]tealth, [N]ull, [F]in, [X]mas [root required]') 
     parser.add_argument('-t', dest='tcp_scanner', action='store_true',
                         help='three way handshake scan mode')
     parser.add_argument('-d', metavar='192.168.0.1', type=str,
@@ -401,20 +413,32 @@ def main():
     if not len(sys.argv[1:]):
         program_usage('')
     else:
-        if (args.syn_scanner == True and args.tcp_scanner == True):
-            program_usage('select only one method to scan')
-        elif (args.syn_scanner == True and args.tcp_scanner == False or args.syn_scanner == False and args.tcp_scanner == True):
-            if (args.d != None and args.R != None):
-                program_usage('you may select only one option')
-            else:
+        if (args.flag_scanner != None and args.tcp_scanner == False):
+            if args.flag_scanner in scan_type:
                 if (args.d == None and args.R == None):
                     # no target selected (single of multiples)
                     program_usage('no target selected')
                 else:
+                    # if user do not set port list, use default
+                    if (args.p == None):
+                        args.p = top_ports_default_scanner
                     # everything its ok, call the first layer
                     first_layer()
-        elif (args.syn_scanner == False and args.tcp_scanner == False):
-            first_layer()  
+            else:
+                program_usage('select a valid scan method')
+        elif (args.flag_scanner == None and args.tcp_scanner == True):
+                if (args.d == None and args.R == None):
+                    # no target selected (single of multiples)
+                    program_usage('no target selected')
+                else:
+                    # if user do not set port list, use default
+                    if (args.p == None):
+                        args.p = top_ports_default_scanner
+                    # everything its ok, call the first layer
+                    first_layer()   
+        elif (args.flag_scanner != None and args.tcp_scanner == True):
+            program_usage('you may select only one option')
+        else:
             try:
                 if (args.script.lower() == 'help'):
                     # script module help message

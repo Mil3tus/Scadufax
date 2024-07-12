@@ -7,11 +7,13 @@ getLogger("scapy.runtime").setLevel(ERROR) # get rid if ipv6 packet
 from scapy.all import * # scapy library
 import time
 import socket
+from iostream import *
 
 # scapy variables
 # hide scapy output
 conf.verb = 0
 
+# send packet with flag function
 def send_syn_packet(source_address, target_address, source_port, destination_port, syn_timeout):
         start_runtime = time.time()
         syn_scan_packet = sr1(IP(src = source_address, dst = target_address)/TCP(sport = source_port,
@@ -100,3 +102,97 @@ def generate_ip_range(scan_from, scan_to):
         ip_range.append(".".join(map(str, temp)))
     return ip_range
 
+
+# send flag funtion prototype
+def send_flag_prototype(source_address, target_address, source_port, destination_port, syn_timeout, packet_flag):
+    start_runtime = time.time()
+    # send packet with a custom flag
+    send_packet = sr1(IP(src = source_address, dst = target_address)/TCP(sport = source_port,
+        dport = int(destination_port), flags = packet_flag), timeout = syn_timeout) # built SYN packet
+    
+    # SYN Stealth scan code
+    # * Send S, if returns SA: Port Open
+    # * Send S, if returns RA: Port Closed
+    # * Send S, if retuns None: Port Filtered
+    if (packet_flag == 'S'):
+        try:
+            packet_code = send_packet.getlayer(TCP)
+            if 'SA' in str(packet_code):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'open', str(packet_service)
+            elif 'RA' in str(packet_code):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'closed', str(packet_service)
+        except Exception as e:
+            end_runtime = time.time() - start_runtime
+            if (int(end_runtime) >= syn_timeout):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'filter', str(packet_service)
+            else:
+                print (e)
+    # FIN scan code
+    # * Send F, if returns None: Port Open/Filtered
+    # * Send F, if returns RA: Port Closed
+    elif (packet_flag == 'F'):
+        try:
+            packet_code = send_packet.getlayer(TCP)
+            if 'RA' in str(packet_code):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'closed', str(packet_service)
+        except Exception as e:
+            end_runtime = time.time() - start_runtime
+            if (int(end_runtime) >= syn_timeout):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'open/f', str(packet_service)
+            else:
+                print (e)
+    # NULL scan code
+    # * Send N, if returns None: Port Open/Filtered
+    # * Send N, if returns RA: Port Closed
+    elif (packet_flag == 'N'):
+        try:
+            packet_code = send_packet.getlayer(TCP)
+            if 'RA' in str(packet_code):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'closed', str(packet_service)
+        except Exception as e:
+            end_runtime = time.time() - start_runtime
+            if (int(end_runtime) >= syn_timeout):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'open/f', str(packet_service)
+            else:
+                print (e)     
+    # XMAS scan code
+    # * Send FPU, if returns None: Port Open/Filtered
+    # * Send FPU, if returns RA: Port Closed
+    elif (packet_flag == 'FPU'):
+        try:
+            packet_code = send_packet.getlayer(TCP)
+            if 'RA' in str(packet_code):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'closed', str(packet_service)
+        except Exception as e:
+            end_runtime = time.time() - start_runtime
+            if (int(end_runtime) >= syn_timeout):
+                # generate service from port number
+                packet_service = generate_service(destination_port, 'tcp')
+                # return information with port number, status and service description
+                return str(destination_port), 'open/f', str(packet_service)
+            else:
+                print (e)

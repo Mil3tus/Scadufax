@@ -1,5 +1,5 @@
 # scadufax scanner
-# created by H1d0raKai - 2024
+# created by Mr.N1k0v - 2024
 
 # required libraries
 import argparse
@@ -72,36 +72,40 @@ def syn_scan_single(single_target_address):
         # start scanning message
         start_scanning_message()
         
-        # show target address
-        printf_target(single_target_address)
+        # verify if host is alive
+        icmp_packet = icmp_send_packet(single_target_address, request_timeout)
+        if (icmp_packet == True):
+            # show target address
+            printf_target(single_target_address)
 
-        # read port list
-        for port_addr in range(0, len(destination_port_address)):
-            time.sleep(int(interval_request))
-            destination_port = int(destination_port_address[port_addr])
-            # syn packet request
-            packet_status = send_syn_packet(source_ip_address, str(single_target_address), int(source_port_address),
-            int(destination_port_address[port_addr]), int(request_timeout))
+            # read port list
+            for port_addr in range(0, len(destination_port_address)):
+                time.sleep(int(interval_request))
+                destination_port = int(destination_port_address[port_addr])
+
+                # syn packet request
+                packet_status = send_syn_packet(source_ip_address, str(single_target_address), int(source_port_address),
+                int(destination_port_address[port_addr]), int(request_timeout))
             
-            # check packet status values
-            if (packet_status != None):
-                packet_port_number = packet_status[0]
-                packet_port_status = packet_status[1]
-                packet_port_service = packet_status[2]
-                # send open port message
-                if (packet_status[1].strip() == 'open'):
-                    printf_open(packet_port_number, packet_port_service)
-                elif (packet_status[1].strip() == 'closed'):
-                    # check if --open flag is active
-                    if (open_only == True):
-                        pass
+                # check packet status values
+                if (packet_status != None):
+                    packet_port_number = packet_status[0]
+                    packet_port_status = packet_status[1]
+                    packet_port_service = packet_status[2]
+                    # send open port message
+                    if (packet_status[1].strip() == 'open'):
+                        printf_open(packet_port_number, packet_port_service)
+                    elif (packet_status[1].strip() == 'closed'):
+                        # check if --open flag is active
+                        if (open_only == True):
+                            pass
+                        else:
+                            # if not, show closed ports
+                            printf_closed(packet_port_number, packet_port_service)
+                    elif (packet_status[1].strip() == 'filtered'):
+                        printf_filtered(packet_port_number, packet_port_service)
                     else:
-                        # if not, show closed ports
-                        printf_closed(packet_port_number, packet_port_service)
-                elif (packet_status[1].strip() == 'filtered'):
-                    printf_filtered(packet_port_number, packet_port_service)
-                else:
-                    pass
+                        pass
         print ('\n')
 
 # syn tcp scan range of addresses (192.168.0.1-192.168.0.254)
@@ -160,45 +164,49 @@ def syn_scan_multiple(scan_from, scan_to):
 
         # read ip table
         for ip_addr in range(0, len(range_target_address)):
-            # set trigger in order to not print target address multiple times
-            multiple_targets_interrupter = True
-            #read port list
-            for port_addr in range(0, len(destination_port_address)):
-                target_address = str(range_target_address[ip_addr])
-                destination_port = int(destination_port_address[port_addr])
+            # verify if host is alive
+            icmp_packet = icmp_send_packet(range_target_address[ip_addr], request_timeout)
+            if (icmp_packet == True):
 
-                # syn packet request
-                packet_status = send_syn_packet(source_ip_address, str(range_target_address[ip_addr]), int(source_port_address),
-                int(destination_port_address[port_addr]), int(request_timeout))
+                # set trigger in order to not print target address multiple times
+                multiple_targets_interrupter = True
+                #read port list
+                for port_addr in range(0, len(destination_port_address)):
+                    target_address = str(range_target_address[ip_addr])
+                    destination_port = int(destination_port_address[port_addr])
+
+                    # syn packet request
+                    packet_status = send_syn_packet(source_ip_address, str(range_target_address[ip_addr]), int(source_port_address),
+                    int(destination_port_address[port_addr]), int(request_timeout))
                 
-                # check packet status values
-                if (packet_status != None):
-                    packet_port_number = packet_status[0]
-                    packet_port_status = packet_status[1]
-                    packet_port_service = packet_status[2]
-                    # send open port message
-                    if (packet_status[1].strip() == 'open'):
-                        if (multiple_targets_interrupter == True):
-                            printf_target(str(range_target_address[ip_addr]))
-                            multiple_targets_interrupter = False
-                        printf_open(packet_port_number, packet_port_service)
-                    elif (packet_status[1].strip() == 'closed'):
-                        # check if --open flag is active
-                        if (open_only == True):
-                            pass
-                        else:
-                            # if not, show closed ports
+                    # check packet status values
+                    if (packet_status != None):
+                        packet_port_number = packet_status[0]
+                        packet_port_status = packet_status[1]
+                        packet_port_service = packet_status[2]
+                        # send open port message
+                        if (packet_status[1].strip() == 'open'):
                             if (multiple_targets_interrupter == True):
                                 printf_target(str(range_target_address[ip_addr]))
                                 multiple_targets_interrupter = False
-                            printf_closed(packet_port_number, packet_port_service)
-                    elif (packet_status[1].strip() == 'filtered'):
-                        if (multiple_targets_interrupter == True):
-                            printf_target(str(range_target_address[ip_addr]))
-                            multiple_targets_interrupter = False
-                        printf_filtered(packet_port_number, packet_port_service)
-                    else:
-                        pass
+                            printf_open(packet_port_number, packet_port_service)
+                        elif (packet_status[1].strip() == 'closed'):
+                            # check if --open flag is active
+                            if (open_only == True):
+                                pass
+                            else:
+                                # if not, show closed ports
+                                if (multiple_targets_interrupter == True):  
+                                    printf_target(str(range_target_address[ip_addr]))
+                                    multiple_targets_interrupter = False
+                                printf_closed(packet_port_number, packet_port_service)
+                        elif (packet_status[1].strip() == 'filtered'):
+                            if (multiple_targets_interrupter == True):
+                                printf_target(str(range_target_address[ip_addr]))
+                                multiple_targets_interrupter = False
+                            printf_filtered(packet_port_number, packet_port_service)
+                        else:
+                            pass
         print ('\n')
         finish_scanning_message()
         print ('\n')

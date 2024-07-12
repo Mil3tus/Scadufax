@@ -54,7 +54,7 @@ def scadufax_banner():
     print (colored('->', 'green', attrs=['bold']), end='')
     print (' Scadufax Network Scanner ', end='')
     print (colored('<-', 'green', attrs=['bold']))
-    print ('\t\t     created by mr.n1k0v')
+    print ('\t\t     created by H1d0raKai')
     print ('\t\t    Grumpsoft Corporation\n')
 
 

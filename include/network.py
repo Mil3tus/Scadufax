@@ -1,5 +1,5 @@
 # network module
-# created by H1d0raKai
+# created by mr.n1k0v
 
 # required libraries syn scan function
 from logging import getLogger, ERROR # import logging things
@@ -11,7 +11,6 @@ import socket
 # scapy variables
 # hide scapy output
 conf.verb = 0
-
 
 def send_syn_packet(source_address, target_address, source_port, destination_port, syn_timeout):
         start_runtime = time.time()
@@ -50,6 +49,13 @@ def send_syn_packet(source_address, target_address, source_port, destination_por
             else:
                 pass
 
+# send ICMP packet in order to show if host is alive or not
+def icmp_send_packet(target_address, icmp_timeout):
+    icmp_packet = sr1(IP(dst = target_address)/ICMP(), timeout = icmp_timeout)
+    if (icmp_packet != None):
+        return True
+    else:
+        return False
 
 # three way handshake connection function
 def tcp_send_packet(target_address, source_port, destination_port, socket_timeout):
@@ -93,3 +99,4 @@ def generate_ip_range(scan_from, scan_to):
                 temp[i-1] += 1
         ip_range.append(".".join(map(str, temp)))
     return ip_range
+

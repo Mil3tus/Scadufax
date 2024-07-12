@@ -1,5 +1,5 @@
 # iostream module
-# created by H1d0raKai
+# created by mr.n1k0v
 
 # required libraries
 from termcolor import colored

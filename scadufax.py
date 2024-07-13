@@ -6,7 +6,7 @@ import argparse
 import sys
 import time
 import random
-import _thread
+#import _thread
 import os
 import time
 
@@ -16,7 +16,12 @@ from network import *
 from iostream import *
 
 # set rescursion limit to use _thread function
-sys.setrecursionlimit(16323056)
+#sys.setrecursionlimit(16323056)
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 # syn tcp scan target only (192.168.0.1)
@@ -63,20 +68,39 @@ def flag_scan_single(single_target_address):
 
         # load profile configuration
         load_scadufax_profile(single_target_address, source_port_address, args.p, request_timeout)
+        
+        # if output enabled, print it into a file
+        if (args.o != None):
+            output_logging(args.o, '[*] scanning profile\n')
+            output_logging(args.o, '\t[>] target address: ' + single_target_address + '\n')
+            output_logging(args.o, '\t[>] source port: ' + str(source_port_address) + '\n')
+            output_logging(args.o, '\t[>] destination port: ' + str(args.p) + '\n')
+            output_logging(args.o, '\t[>] request timeout: ' + str(request_timeout) + '\n\n')
 
 
         # send parameters for task calc function
         calculated_task = calc_task(request_timeout, interval_request, 1, len(destination_port_address))
         time_left_message(calculated_task)
 
+        # if output enabled, print it into a file
+        #if (args.o != None):
+            #output_logging(args.o, '[+] estimated task time [ ' + calculated_task + ']\n')
+            
         # start scanning message
         start_scanning_message()
         
+        # if output enabled, print it into a file
+        if (args.o != None):
+            output_logging(args.o, '[*] start scanning [ ' + str(datetime.datetime.now()) + ']\n\n')
+
         # verify if host is alive
         icmp_packet = icmp_send_packet(single_target_address, request_timeout)
         if (icmp_packet == True):
             # show target address
             printf_target(single_target_address)
+            # if output enabled, print it into a file
+            if (args.o != None):
+                output_logging(args.o, single_target_address + '\n')
 
             # read port list
             for port_addr in range(0, len(destination_port_address)):
@@ -98,7 +122,11 @@ def flag_scan_single(single_target_address):
                     packet_port_service = packet_status[2]
                     # send open port message
                     if (packet_status[1].strip() == 'open'):
+                        # print status port
                         printf_open(packet_port_number, packet_port_service)
+                        # if output enabled, print it into a file
+                        if (args.o != None):
+                            output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\topen\t' + packet_port_service + '\n')
                     elif (packet_status[1].strip() == 'closed'):
                         # check if --open flag is active
                         if (open_only == True):
@@ -106,13 +134,38 @@ def flag_scan_single(single_target_address):
                         else:
                             # if not, show closed ports
                             printf_closed(packet_port_number, packet_port_service)
+                            # if output enabled, print it into a file
+                            if (args.o != None):
+                                output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\tclosed\t' + packet_port_service + '\n')
                     elif (packet_status[1].strip() == 'filtered'):
+                        # print status port
                         printf_filtered(packet_port_number, packet_port_service)
+                        # if output enabled, print it into a file
+                        if (args.o != None):
+                            output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\tfilter\t' + packet_port_service + '\n')
                     elif (packet_status[1].strip() == 'open/f'):
+                        # print status port
                         printf_openf(packet_port_number, packet_port_service)
+                        # if output enabled, print it into a file
+                        if (args.o != None):
+                            output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\t[open]/fil\t' + packet_port_service + '\n')
                     else:
                         pass
         print ('\n')
+        # if output enabled, print it into a file
+        if (args.o != None):
+            output_logging(args.o, '\n[*] task finished [' + str(datetime.datetime.now()) + ']\n\n')
+
+        finish_scanning_message()
+
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 # syn tcp scan range of addresses (192.168.0.1-192.168.0.254)
 def flag_scan_multiple(scan_from, scan_to):
@@ -161,12 +214,24 @@ def flag_scan_multiple(scan_from, scan_to):
         # load profile configuration
         load_scadufax_profile(scan_from + '-' + scan_to, source_port_address, args.p, request_timeout)
 
+        # if output enabled, print it into a file
+        if (args.o != None):
+            output_logging(args.o, '[*] scanning profile\n')
+            output_logging(args.o, '\t[>] target address: ' + scan_from + '-' + scan_to + '\n')
+            output_logging(args.o, '\t[>] source port: ' + str(source_port_address) + '\n')
+            output_logging(args.o, '\t[>] destination port: ' + str(args.p) + '\n')
+            output_logging(args.o, '\t[>] request timeout: ' + str(request_timeout) + '\n\n')
+
         # send parameters for task calc function
         calculated_task = calc_task(request_timeout, interval_request, len(range_target_address), len(destination_port_address))
         time_left_message(calculated_task)
 
         # start scanning message
         start_scanning_message()
+
+        # if output enabled, print it into a file
+        if (args.o != None):
+            output_logging(args.o, '[*] start scanning [ ' + str(datetime.datetime.now()) + ']\n\n')
 
         # read ip table
         for ip_addr in range(0, len(range_target_address)):
@@ -180,8 +245,8 @@ def flag_scan_multiple(scan_from, scan_to):
                 for port_addr in range(0, len(destination_port_address)):
                     target_address = str(range_target_address[ip_addr])
                     destination_port = int(destination_port_address[port_addr])
+
                     # send packet with flags
-                    
                     if (args.flag_scanner == 'X'):
                         packet_status = send_flag_prototype(source_ip_address, str(range_target_address[ip_addr]), int(source_port_address),
                     int(destination_port_address[port_addr]), int(request_timeout), 'FPU')
@@ -199,7 +264,16 @@ def flag_scan_multiple(scan_from, scan_to):
                             if (multiple_targets_interrupter == True):
                                 printf_target(str(range_target_address[ip_addr]))
                                 multiple_targets_interrupter = False
+                                
+                                # if output enabled, print it into a file
+                                if (args.o != None):
+                                     output_logging(args.o, '\n' + str(range_target_address[ip_addr]) + '\n')
+
                             printf_open(packet_port_number, packet_port_service)
+                            # if output enabled, print it into a file
+                            if (args.o != None):
+                                output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\topen\t' + packet_port_service + '\n')
+
                         elif (packet_status[1].strip() == 'closed'):
                             # check if --open flag is active
                             if (open_only == True):
@@ -209,22 +283,55 @@ def flag_scan_multiple(scan_from, scan_to):
                                 if (multiple_targets_interrupter == True):  
                                     printf_target(str(range_target_address[ip_addr]))
                                     multiple_targets_interrupter = False
+
+                                # if output enabled, print it into a file
+                                if (args.o != None):
+                                    output_logging(args.o, '\n' + str(range_target_address[ip_addr]) + '\n')
+
                                 printf_closed(packet_port_number, packet_port_service)
+                                # if output enabled, print it into a file
+                                if (args.o != None):
+                                    output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\tclosed\t' + packet_port_service + '\n')
+
                         elif (packet_status[1].strip() == 'filtered'):
                             if (multiple_targets_interrupter == True):
                                 printf_target(str(range_target_address[ip_addr]))
                                 multiple_targets_interrupter = False
+
+                                # if output enabled, print it into a file
+                                if (args.o != None):
+                                     output_logging(args.o, '\n' + str(range_target_address[ip_addr]) + '\n')
+
                             printf_filtered(packet_port_number, packet_port_service)
+                            # if output enabled, print it into a file
+                            if (args.o != None):
+                                output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\tfilter\t' + packet_port_service + '\n')
+
                         elif (packet_status[1].strip() == 'open/f'):
                             if (multiple_targets_interrupter == True):
                                 printf_target(str(range_target_address[ip_addr]))
                                 multiple_targets_interrupter = False
+
+                                # if output enabled, print it into a file
+                                if (args.o != None):
+                                     output_logging(args.o, '\n' + str(range_target_address[ip_addr]) + '\n')
+
                             printf_openf(packet_port_number, packet_port_service)
+                            if (args.o != None):
+                                output_logging(args.o, '\t- ' + str(packet_port_number) + '/tcp\t[open]\t' + packet_port_service + '\n')
+
                         else:
                             pass
         print ('\n')
         finish_scanning_message()
         print ('\n')
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 # three way handshake tcp scan target only (192.168.0.1)
@@ -306,6 +413,12 @@ def tcp_scan_single(single_target_address):
     print ('\n')
 
 
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 # second layer of parameters reading
 def first_layer():
     # syn scanner selected
@@ -352,6 +465,13 @@ def first_layer():
                 program_usage('invalid ip address')
             else:
                 tcp_scan_single(single_target_address)
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 # main function
 def main():
@@ -449,5 +569,17 @@ def main():
             except:
                 pass
 
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 # start here
-main()
+try:
+    main()
+except Exception as e:
+    # sudo required
+    print (e)
+    sys.exit(1)

@@ -13,6 +13,10 @@ from iostream import *
 # hide scapy output
 conf.verb = 0
 
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 # send ICMP packet in order to show if host is alive or not
 def icmp_send_packet(target_address, icmp_timeout):
     icmp_packet = sr1(IP(dst = target_address)/ICMP(), timeout = icmp_timeout)
@@ -20,6 +24,11 @@ def icmp_send_packet(target_address, icmp_timeout):
         return True
     else:
         return False
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 # three way handshake connection function
 def tcp_send_packet(target_address, source_port, destination_port, socket_timeout):
@@ -29,13 +38,20 @@ def tcp_send_packet(target_address, source_port, destination_port, socket_timeou
     try:
         socket1.bind(('', destination_port))
         socket1.connect((target_address, destination_port))
-        return str(destination_port), 'open', 'unkown service'
+        packet_service = generate_service(destination_port, 'tcp')
+        return str(destination_port), 'open', str(packet_service)
     except Exception as e:
         end_runtime = time.time() - start_runtime
         if (int(end_runtime) == socket_timeout):
-            return str(destination_port), 'filtered', 'unkown service'
+            packet_service = generate_service(destination_port, 'tcp')
+            return str(destination_port), 'filtered', str(packet_service)
         else:
-            return str(destination_port), 'closed', 'unkown service'
+            packet_service = generate_service(destination_port, 'tcp')
+            return str(destination_port), 'closed', str(packet_service)
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 
 # function to generate a random value from source port
@@ -46,6 +62,9 @@ def random_source_port():
         source_port_random.append(i)
     source_port = random.choice(source_port_random)
     return source_port
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 
 # generate ip list (from: 192.168.0.1 to: 192.168.0.254)
@@ -63,6 +82,11 @@ def generate_ip_range(scan_from, scan_to):
                 temp[i-1] += 1
         ip_range.append(".".join(map(str, temp)))
     return ip_range
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 # send flag funtion prototype
@@ -158,7 +182,3 @@ def send_flag_prototype(source_address, target_address, source_port, destination
                 return str(destination_port), 'open/f', str(packet_service)
             else:
                 print (e)
-
-
-#pacote = send_flag_prototype(None, '192.168.0.1', 6762, 22, 5, 'S')
-#print (pacote)

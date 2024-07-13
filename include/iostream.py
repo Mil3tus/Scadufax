@@ -48,6 +48,10 @@ def calc_task(request_timeout, interval_request, address_pool, port_pool):
         return str("{:.1f}".format(time_calc)) + ' seconds left'
 
 
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 # scadufax scanner banner
 def scadufax_banner():
     time.sleep(1)
@@ -56,7 +60,10 @@ def scadufax_banner():
     print (' Scadufax Network Scanner ', end='')
     print (colored('<-', 'green', attrs=['bold']))
     print ('\t\t     created by H1d0raKai')
-    print ('\t\t    Grumpsoft Corporation\n')
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 
 # show scadufax profile scanning
@@ -79,11 +86,20 @@ def load_scadufax_profile(target_address, source_port, destination_port, request
     print (colored('>', 'cyan', attrs=['bold']), end='')
     print ('] request timeout: ' + str(request_timeout))
 
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 # time left message
 def time_left_message(time_value):
     print ('\n[', end='')
     print (colored('+', 'red', attrs=['bold']), end='')
     print ('] estimated task time [ ' + str(time_value) + ' ]')
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
 
 # start scanning message
 def start_scanning_message():
@@ -91,6 +107,10 @@ def start_scanning_message():
     print ('[', end='')
     print (colored('*', 'green', attrs=['bold']), end='')
     print ('] start scanning [' + str(datetime.datetime.now()) + ']')
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
 
 # start scanning message
 def finish_scanning_message():
@@ -100,11 +120,17 @@ def finish_scanning_message():
     print ('] task finished [' + str(datetime.datetime.now()) + ']\n')
 
 
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 # show target address on screen
 def printf_target(target_address):
     print ('\n[', end='')
     print (colored('!', 'yellow', attrs=['bold']), end='')
     print ('] ' + str(target_address))
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 
 # show open port message
@@ -114,6 +140,7 @@ def printf_open(port_address, port_service):
     print (' ' + str(port_address) + '/tcp\t', end='')
     print (colored('open', 'green'), end='')
     print ('\t' + str(port_service))
+
 
 # show open port message
 def printf_openf(port_address, port_service):
@@ -139,6 +166,11 @@ def printf_closed(port_address, port_service):
     print (colored('closed', 'red'), end='')
     print ('\t' + str(port_service))
 
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
 # function to validate ip address
 # if the function return NO VALUE (None) the ip address is valid
 def validate_ip_address(ip_address):
@@ -160,6 +192,10 @@ def validate_ip_address(ip_address):
     except:
         # invalid ip address
         return 1
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
 
 # error message
 def program_usage(error_message):
@@ -209,3 +245,16 @@ def generate_service(port_number, protocol):
         except Exception as e:
             print (e)
             sys.exit()
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# file output function
+def output_logging(file_path, line_content):
+    try:
+        with open(file_path, 'a+') as write_line:
+            write_line.write(line_content)
+        write_line.close()
+    except Exception as e:
+        print (e)

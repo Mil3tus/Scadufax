@@ -133,40 +133,35 @@ def printf_target(target_address):
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 
-# show open port message
-def printf_open(port_address, port_service):
-    print ('\t', end='')
-    print (colored('-', 'white', attrs=['bold']), end='')
-    print (' ' + str(port_address) + '/tcp\t', end='')
-    print (colored('open', 'green'), end='')
-    print ('\t' + str(port_service))
-
-
-# show open port message
-def printf_openf(port_address, port_service):
-    print ('\t', end='')
-    print (colored('-', 'white', attrs=['bold']), end='')
-    print (' ' + str(port_address) + '/tcp\t', end='')
-    print (colored('open', 'magenta'), end='')
-    print ('\t' + str(port_service))
-
-# show filtered port message
-def printf_filtered(port_address, port_service):
-    print ('\t', end='')
-    print (colored('-', 'white', attrs=['bold']), end='')
-    print (' ' + str(port_address) + '/tcp\t', end='')
-    print (colored('filter', 'yellow'), end='')
-    print ('\t' + str(port_service))
-
-# show close port message
-def printf_closed(port_address, port_service):
-    print ('\t', end='')
-    print (colored('-', 'white', attrs=['bold']), end='')
-    print (' ' + str(port_address) + '/tcp\t', end='')
-    print (colored('closed', 'red'), end='')
-    print ('\t' + str(port_service))
-
-
+def printf_status(port_address, port_service, port_status):
+    # print open port status
+    if (port_status == 'open'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end='')
+        print (' ' + str(port_address) + '/tcp\t', end='')
+        print (colored('open', 'green'), end='')
+        print ('\t' + str(port_service))
+    # print closed port status
+    elif (port_status == 'closed'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end='')
+        print (' ' + str(port_address) + '/tcp\t', end='')
+        print (colored('closed', 'red'), end='')
+        print ('\t' + str(port_service))
+    # print filtered port status
+    elif (port_status == 'filtered'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end='')
+        print (' ' + str(port_address) + '/tcp\t', end='')
+        print (colored('filter', 'yellow'), end='')
+        print ('\t' + str(port_service))
+    # print open/filtered port status
+    elif (port_status == 'open/f'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end='')
+        print (' ' + str(port_address) + '/tcp\t', end='')
+        print (colored('open', 'magenta'), end='')
+        print ('\t' + str(port_service))      
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -207,6 +202,10 @@ def program_usage(error_message):
         print ('')
     else:
         print ('error: ' + error_message)
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 # generate service from port number
 def generate_service(port_number, protocol):

@@ -4,6 +4,11 @@
 # pyinstaller compile command
 # pyinstaller -D -F -n scadufax -c scadufax.py -paths=/lib/python3/dist-packages --paths=include --onefile
 
+
+# NOTES (next tasks)
+# UPDATE DEFAULT PORT LIST
+# CREATE UDP SCAN FUNCTION 
+
 # required libraries
 import argparse
 import sys
@@ -303,12 +308,6 @@ def flag_scan_multiple(scan_from, scan_to):
         request_timeout = 5
     else:
         request_timeout = int(args.timeout)
-        
-    # if user do not specify --source-port generate a random port number
-    if (args.source_port == None):
-        source_port_address = random_source_port()
-    else:
-        source_port_address = int(args.source_port)
 
     # if interval between requests not specified
     if (args.i == None):
@@ -321,6 +320,12 @@ def flag_scan_multiple(scan_from, scan_to):
         open_only = True
     else:
         open_only = False
+
+    # if user do not specify --source-port generate a random port number
+    if (args.source_port == None):
+        source_port_address = random_source_port()
+    else:
+        source_port_address = int(args.source_port)
 
     # configure destination port (default option)
     if (args.p == 'default'):
@@ -361,6 +366,7 @@ def flag_scan_multiple(scan_from, scan_to):
 
     # read ip table
     for ip_addr in range(0, len(range_target_address)):
+        time.sleep(int(interval_request))
         # verify if host is alive
         icmp_packet = icmp_send_packet(range_target_address[ip_addr], request_timeout)
         if (icmp_packet == True):
@@ -371,6 +377,7 @@ def flag_scan_multiple(scan_from, scan_to):
             # set trigger in order to not print target address multiple times
             multiple_targets_interrupter = True
             #read port list
+
             for port_addr in range(0, len(destination_port_address)):
                 target_address = str(range_target_address[ip_addr])
                 destination_port = int(destination_port_address[port_addr])
@@ -506,6 +513,7 @@ def tcp_scan_multiple(scan_from, scan_to):
     # start scanning message
     start_scanning_message()
 
+    
 
     # if output enabled, print it into a file
     if (args.o != None):
@@ -529,11 +537,10 @@ def tcp_scan_multiple(scan_from, scan_to):
     
         # read ip table
     for ip_addr in range(0, len(range_target_address)):
-        # verify if host is alive
-        #icmp_packet = icmp_send_packet(range_target_address[ip_addr], request_timeout)
-        #if (icmp_packet == True):
+        time.sleep(int(interval_request))
         if (args.o != None):
             output_logging(args.o, '\n[!] ' + str(range_target_address[ip_addr]) + '\n')
+
         # set trigger in order to not print target address multiple times
         multiple_targets_interrupter = True
         #read port list

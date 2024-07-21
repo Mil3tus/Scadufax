@@ -7,6 +7,7 @@ getLogger("scapy.runtime").setLevel(ERROR) # get rid if ipv6 packet
 from scapy.all import * # scapy library
 import time
 import socket
+from ftplib import FTP
 from iostream import *
 
 # scapy variables
@@ -30,10 +31,36 @@ def icmp_send_packet(target_address, icmp_timeout):
 
 
 
-# three way handshake connection function
+# three way handshake connection function (TCP Protocol)
 def tcp_send_packet(target_address, source_port, destination_port, socket_timeout):
+    # create a ftp connection
     start_runtime = time.time()
     socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket1.settimeout(socket_timeout)
+    try:
+        # set source port
+        socket1.bind(('', destination_port))
+        socket1.connect((target_address, destination_port))
+        # generate service name
+        packet_service = generate_service(destination_port, 'tcp')
+        # return port status
+        return str(destination_port), 'open', str(packet_service)
+    except Exception as e:
+        end_runtime = time.time() - start_runtime
+        if (int(end_runtime) == socket_timeout):
+            packet_service = generate_service(destination_port, 'tcp')
+            # return port status
+            return str(destination_port), 'filtered', str(packet_service)
+        else:
+            packet_service = generate_service(destination_port, 'tcp')
+            # return port status
+            return str(destination_port), 'closed', str(packet_service)
+
+
+# three way handshake connection function (UDP Protocol)
+def udp_send_packet(target_address, source_port, destination_port, socket_timeout):
+    start_runtime = time.time()
+    socket1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     socket1.settimeout(socket_timeout)
     try:
         socket1.bind(('', destination_port))
@@ -48,7 +75,6 @@ def tcp_send_packet(target_address, source_port, destination_port, socket_timeou
         else:
             packet_service = generate_service(destination_port, 'tcp')
             return str(destination_port), 'closed', str(packet_service)
-
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------

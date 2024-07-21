@@ -729,7 +729,7 @@ def main():
     parser.add_argument('-d', metavar='192.168.0.1', type=str,
                         help='single target')
     parser.add_argument('-R', metavar='X.X.X.1-X.X.X.254', type=str,
-                        help='range of targets [root required]')
+                        help='range of targets')
     parser.add_argument('-p', metavar='21 or 21,22,25', type=str,
                         help='port number, range or default (top ports)')
     parser.add_argument('-i', metavar='0.1-10', type=str,

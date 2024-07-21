@@ -32,6 +32,7 @@ def calc_task(request_timeout, interval_request, address_pool, port_pool):
     # multiplies time unit and port pool
     address_pool = address_pool
     time_calc = port_unit * address_pool
+    time_calc = time_calc / 2
 
     if (time_calc > 60):
         # minutes
@@ -55,19 +56,27 @@ def calc_task(request_timeout, interval_request, address_pool, port_pool):
 # scadufax scanner banner
 def scadufax_banner():
     time.sleep(1)
-    print ('\n\t\t', end='')
-    print (colored('->', 'green', attrs=['bold']), end='')
-    print (' Scadufax Network Scanner ', end='')
-    print (colored('<-', 'green', attrs=['bold']))
-    print ('\t\t     created by H1d0raKai')
-
-
+    print ('\n\n')
+    print ('\t\t███████╗ ██████╗ █████╗ ██████╗ ██╗   ██╗███████╗ █████╗ ██╗  ██╗')
+    print ('\t\t██╔════╝██╔════╝██╔══██╗██╔══██╗██║   ██║██╔════╝██╔══██╗╚██╗██╔╝')
+    print ('\t\t███████╗██║     ███████║██║  ██║██║   ██║█████╗  ███████║ ╚███╔╝') 
+    print ('\t\t╚════██║██║     ██╔══██║██║  ██║██║   ██║██╔══╝  ██╔══██║ ██╔██╗') 
+    print ('\t\t███████║╚██████╗██║  ██║██████╔╝╚██████╔╝██║     ██║  ██║██╔╝ ██╗')
+    print ('\t\t╚══════╝ ╚═════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝')
+    print ('\n\n')
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 
 # show scadufax profile scanning
 def load_scadufax_profile(target_address, source_port, destination_port, request_timeout):
+
+    top_ports_default_scanner = '1,3,4,6,7,9,13,17,19,20,21,22,23,24,25,26,32,' + \
+    '33,37,42,43,49,53,70,80,135,137,139,443,445,458,464,464,481,497,' + \
+    '500,512,515,524,2020,2121,2222,2323,2424,2525,3005,3006,3007,3031,3052,' + \
+    '3306,4443,4550,4567,4662,5288,8080,8081,8082,8083,8084'
+    
+    
     time.sleep(1)
     print ('\n[', end='')
     print (colored('*', 'green', attrs=['bold']), end='')
@@ -81,8 +90,12 @@ def load_scadufax_profile(target_address, source_port, destination_port, request
     print ('] source port: ' + str(source_port))
     print ('\t[', end='')
     print (colored('>', 'cyan', attrs=['bold']), end='')
-    print ('] destination port(s): ' + str(destination_port))
-    print ('\t[', end='')
+    if (destination_port == top_ports_default_scanner):
+        print ('] destination port(s): default')
+        print ('\t[', end='')
+    else:
+        print ('] destination port(s): ' + str(destination_port))
+        print ('\t[', end='')
     print (colored('>', 'cyan', attrs=['bold']), end='')
     print ('] request timeout: ' + str(request_timeout))
 
@@ -137,31 +150,39 @@ def printf_status(port_address, port_service, port_status):
     # print open port status
     if (port_status == 'open'):
         print ('\t', end='')
-        print (colored('-', 'white', attrs=['bold']), end='')
-        print (' ' + str(port_address) + '/tcp\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
         print (colored('open', 'green'), end='')
-        print ('\t' + str(port_service))
+        print (f"{'':<7}", end='')
+        print (str(port_service))
     # print closed port status
     elif (port_status == 'closed'):
         print ('\t', end='')
-        print (colored('-', 'white', attrs=['bold']), end='')
-        print (' ' + str(port_address) + '/tcp\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
         print (colored('closed', 'red'), end='')
-        print ('\t' + str(port_service))
+        print (f"{'':<5}", end='')
+        print (str(port_service))
     # print filtered port status
     elif (port_status == 'filtered'):
         print ('\t', end='')
-        print (colored('-', 'white', attrs=['bold']), end='')
-        print (' ' + str(port_address) + '/tcp\t', end='')
-        print (colored('filter', 'yellow'), end='')
-        print ('\t' + str(port_service))
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
+        print (colored('filtered', 'yellow'), end='')
+        print (f"{'':<3}", end='')
+        print (str(port_service))
     # print open/filtered port status
-    elif (port_status == 'open/f'):
+    elif (port_status == 'open/f'):          
         print ('\t', end='')
-        print (colored('-', 'white', attrs=['bold']), end='')
-        print (' ' + str(port_address) + '/tcp\t', end='')
-        print (colored('open', 'magenta'), end='')
-        print ('\t' + str(port_service))      
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
+        print (colored('[open]', 'magenta'), end='')
+        print (f"{'':<5}", end='')
+        print (str(port_service))      
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -209,10 +230,10 @@ def program_usage(error_message):
 
 # generate service from port number
 def generate_service(port_number, protocol):
-    # verify protocol
+
     if (protocol == 'tcp'):
         try:
-            # try to open database file
+            # try to find tcp.csv on the same folder as scadufax binary
             with open('database/tcp.csv') as tcp_content:
                 # read line by line
                 for tcp_line in tcp_content:
@@ -223,13 +244,30 @@ def generate_service(port_number, protocol):
                         checked_line = tcp_line.lower()
                         explode_line = checked_line.split('"',)
                         generated_service = explode_line[3]
+                        # return service name
                         return generated_service
-        except Exception as e:
-            print (e)
-            sys.exit()
+        except:
+            try:
+                # try to find tcp.csv on /usr/share scadufax (installed version)
+                with open('/usr/share/scadufax/database/tcp.csv') as tcp_content:
+                    # read line by line
+                    for tcp_line in tcp_content:
+                        # create port standard for compare
+                        check_port = ',' + str(port_number) + ','
+                        if check_port in tcp_line:
+                            # if port found, extract services from line
+                            checked_line = tcp_line.lower()
+                            explode_line = checked_line.split('"',)
+                            generated_service = explode_line[3]
+                            # return service name
+                            return generated_service
+            except Exception as e:
+                print (e)
+
+
     elif (protocol == 'udp'):
         try:
-            # try to open database file
+            # try to find tcp.csv on the same folder as scadufax binary
             with open('database/udp.csv') as udp_content:
                 # read line by line
                 for udp_line in udp_content:
@@ -240,10 +278,25 @@ def generate_service(port_number, protocol):
                         checked_line = udp_line.lower()
                         explode_line = checked_line.split('"',)
                         generated_service = explode_line[3]
+                        # return service name
                         return generated_service
-        except Exception as e:
-            print (e)
-            sys.exit()
+        except:
+            try:
+                # try to find tcp.csv on /usr/share scadufax (installed version)
+                with open('/usr/share/scadufax/database/udp.csv') as udp_content:
+                    # read line by line
+                    for udp_line in tcp_content:
+                        # create port standard for compare
+                        check_port = ',' + str(port_number) + ','
+                        if check_port in udp_line:
+                            # if port found, extract services from line
+                            checked_line = udp_line.lower()
+                            explode_line = checked_line.split('"',)
+                            generated_service = explode_line[3]
+                            # return service name
+                            return generated_service
+            except Exception as e:
+                print (e)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------

@@ -1,232 +1,312 @@
-# network module
+# iostream module
 # created by H1d0raKai
 
-# required libraries syn scan function
-from logging import getLogger, ERROR # import logging things
-getLogger("scapy.runtime").setLevel(ERROR) # get rid if ipv6 packet
-from scapy.all import * # scapy library
+# required libraries
+from termcolor import colored
 import time
-import socket
-from ftplib import FTP
-from iostream import *
+import datetime
+import sys
 
-# scapy variables
-# hide scapy output
-conf.verb = 0
+#---------------------------------------------------------
+# term color example
+#print (colored('hello world', 'green'))
+#print (colored('hello world', 'green', attrs=['bold']))
 
+# color grade
+# red, black, light_cyan, green, magenta, white, etc
 
-#-------------------------------------------------------------------------------------------------------------------------------------
+# highlights
+# on_black, on_red, on_green, on_white, etc
 
+# attribs
+# bold, dark, underline, blink, reverse, and concealed
 
-# send ICMP packet in order to show if host is alive or not
-def icmp_send_packet(target_address, icmp_timeout):
-    icmp_packet = sr1(IP(dst = target_address)/ICMP(), timeout = icmp_timeout)
-    if (icmp_packet != None):
-        return True
-    else:
-        return False
+#---------------------------------------------------------
 
+# task calc until the end of execution
+def calc_task(request_timeout, interval_request, address_pool, port_pool):
+    # plus time unit (request_timeout + interval_request)
+    time_unit = float(request_timeout) + float(interval_request)
+    # multiplies time unit * len(port)
+    port_unit = time_unit * port_pool
+    # multiplies time unit and port pool
+    address_pool = address_pool
+    time_calc = port_unit * address_pool
+    time_calc = time_calc / 2
 
-#-------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-# three way handshake connection function (TCP Protocol)
-def tcp_send_packet(target_address, source_port, destination_port, socket_timeout):
-    # create a ftp connection
-    #if (destination_port == 21):
-    #    try:
-    #        # connect to ftp server
-    #        ftp_socket = FTP(target_address)
-    #        # get ftp server handle
-    #        ftp_handle = _ftp_socket.getwelcome()
-    #        # remove junk information from handle
-    #        strip_handle = ftp_handle.split('220  ',)
-    #        # set limit of 20 chars by handle (to not transform scan result on a mess)
-    #        ftp_handle = strip_handle[1].lower()[:20] + '...'
-
-    #        # return port status
-    #        packet_service = generate_service(destination_port, 'tcp')
-    #        return str(destination_port), 'open', str(packet_service)
-
-    #    except:
-    #        # connection fail
-    #        packet_service = generate_service(destination_port, 'tcp')
-    #        return str(destination_port), 'closed', str(packet_service)
-
-    #else:
-        # set runtime to calculate timeout connection
-        start_runtime = time.time()
-        socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        socket1.settimeout(socket_timeout)
-        try:
-            # set source port
-            socket1.bind(('', destination_port))
-            socket1.connect((target_address, destination_port))
-            # generate service name
-            packet_service = generate_service(destination_port, 'tcp')
-            # return port status
-            return str(destination_port), 'open', str(packet_service)
-        except Exception as e:
-            end_runtime = time.time() - start_runtime
-            if (int(end_runtime) == socket_timeout):
-                packet_service = generate_service(destination_port, 'tcp')
-                # return port status
-                return str(destination_port), 'filtered', str(packet_service)
-            else:
-                packet_service = generate_service(destination_port, 'tcp')
-                # return port status
-                return str(destination_port), 'closed', str(packet_service)
-
-
-# three way handshake connection function (UDP Protocol)
-def udp_send_packet(target_address, source_port, destination_port, socket_timeout):
-    start_runtime = time.time()
-    socket1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    socket1.settimeout(socket_timeout)
-    try:
-        socket1.bind(('', destination_port))
-        socket1.connect((target_address, destination_port))
-        packet_service = generate_service(destination_port, 'tcp')
-        return str(destination_port), 'open', str(packet_service)
-    except Exception as e:
-        end_runtime = time.time() - start_runtime
-        if (int(end_runtime) == socket_timeout):
-            packet_service = generate_service(destination_port, 'tcp')
-            return str(destination_port), 'filtered', str(packet_service)
+    if (time_calc > 60):
+        # minutes
+        time_calc = time_calc / 60
+        if (time_calc > 60):
+            # hour
+            time_calc = time_calc / 60
+            return str("{:.1f}".format(time_calc)) + ' hours left'
         else:
-            packet_service = generate_service(destination_port, 'tcp')
-            return str(destination_port), 'closed', str(packet_service)
-
-
-#-------------------------------------------------------------------------------------------------------------------------------------
-
-
-# function to generate a random value from source port
-# when the user doesn't use the --source-port flag
-def random_source_port():
-    source_port_random = []
-    for i in range(1, 65535):
-        source_port_random.append(i)
-    source_port = random.choice(source_port_random)
-    return source_port
-
-
-#-------------------------------------------------------------------------------------------------------------------------------------
-
-
-# generate ip list (from: 192.168.0.1 to: 192.168.0.254)
-def generate_ip_range(scan_from, scan_to):
-    start = list(map(int, scan_from.split(".")))
-    end = list(map(int, scan_to.split(".")))
-    temp = start
-    ip_range = []
-    ip_range.append(scan_from)
-    while temp != end:
-        start[3] += 1
-        for i in (3, 2, 1):
-            if temp[i] == 255:
-                temp[i] = 1
-                temp[i-1] += 1
-        ip_range.append(".".join(map(str, temp)))
-    return ip_range
-
+            return str("{:.1f}".format(time_calc)) + ' minutes left'
+    else:
+        # seconds
+        time_calc = time_calc
+        return str("{:.1f}".format(time_calc)) + ' seconds left'
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 
 
-# send flag funtion prototype
-def send_flag_prototype(source_address, target_address, source_port, destination_port, syn_timeout, packet_flag):
-    start_runtime = time.time()
-    # send packet with a custom flag
-    send_packet = sr1(IP(src = source_address, dst = target_address)/TCP(sport = source_port,
-        dport = int(destination_port), flags = packet_flag), timeout = syn_timeout) # built SYN packet
+# scadufax scanner banner
+def scadufax_banner():
+    time.sleep(1)
+    print ('\n\n')
+    print ('\t\t███████╗ ██████╗ █████╗ ██████╗ ██╗   ██╗███████╗ █████╗ ██╗  ██╗')
+    print ('\t\t██╔════╝██╔════╝██╔══██╗██╔══██╗██║   ██║██╔════╝██╔══██╗╚██╗██╔╝')
+    print ('\t\t███████╗██║     ███████║██║  ██║██║   ██║█████╗  ███████║ ╚███╔╝') 
+    print ('\t\t╚════██║██║     ██╔══██║██║  ██║██║   ██║██╔══╝  ██╔══██║ ██╔██╗') 
+    print ('\t\t███████║╚██████╗██║  ██║██████╔╝╚██████╔╝██║     ██║  ██║██╔╝ ██╗')
+    print ('\t\t╚══════╝ ╚═════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝')
+    print ('\n\n')
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# show scadufax profile scanning
+def load_scadufax_profile(target_address, source_port, destination_port, request_timeout):
+
+    top_ports_default_scanner = '1,3,4,6,7,9,13,17,19,20,21,22,23,24,25,26,32,' + \
+    '33,37,42,43,49,53,70,80,135,137,139,443,445,458,464,464,481,497,' + \
+    '500,512,515,524,2020,2121,2222,2323,2424,2525,3005,3006,3007,3031,3052,' + \
+    '3306,4443,4550,4567,4662,5288,8080,8081,8082,8083,8084'
     
-    # SYN Stealth scan code
-    # * Send S, if returns SA: Port Open
-    # * Send S, if returns RA: Port Closed
-    # * Send S, if retuns None: Port Filtered
-    if (packet_flag == 'S'):
+    
+    time.sleep(1)
+    print ('\n[', end='')
+    print (colored('*', 'green', attrs=['bold']), end='')
+    print ('] scanning profile')
+
+    print ('\t[', end='')
+    print (colored('>', 'cyan', attrs=['bold']), end='')
+    print ('] target address: ' + str(target_address))
+    print ('\t[', end='')
+    print (colored('>', 'cyan', attrs=['bold']), end='')
+    print ('] source port: ' + str(source_port))
+    print ('\t[', end='')
+    print (colored('>', 'cyan', attrs=['bold']), end='')
+    if (destination_port == top_ports_default_scanner):
+        print ('] destination port(s): default')
+        print ('\t[', end='')
+    else:
+        print ('] destination port(s): ' + str(destination_port))
+        print ('\t[', end='')
+    print (colored('>', 'cyan', attrs=['bold']), end='')
+    print ('] request timeout: ' + str(request_timeout))
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# time left message
+def time_left_message(time_value):
+    print ('\n[', end='')
+    print (colored('+', 'red', attrs=['bold']), end='')
+    print ('] estimated task time [ ' + str(time_value) + ' ]')
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# start scanning message
+def start_scanning_message():
+    time.sleep(1)
+    print ('[', end='')
+    print (colored('*', 'green', attrs=['bold']), end='')
+    print ('] start scanning [' + str(datetime.datetime.now()) + ']')
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# start scanning message
+def finish_scanning_message():
+    time.sleep(1)
+    print ('[', end='')
+    print (colored('*', 'light_cyan', attrs=['bold']), end='')
+    print ('] task finished [' + str(datetime.datetime.now()) + ']\n')
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# show target address on screen
+def printf_target(target_address):
+    print ('\n[', end='')
+    print (colored('!', 'yellow', attrs=['bold']), end='')
+    print ('] ' + str(target_address))
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+def printf_status(port_address, port_service, port_status):
+    # print open port status
+    if (port_status == 'open'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
+        print (colored('open', 'green'), end='')
+        print (f"{'':<7}", end='')
+        print (str(port_service))
+    # print closed port status
+    elif (port_status == 'closed'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
+        print (colored('closed', 'red'), end='')
+        print (f"{'':<5}", end='')
+        print (str(port_service))
+    # print filtered port status
+    elif (port_status == 'filtered'):
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
+        print (colored('filtered', 'yellow'), end='')
+        print (f"{'':<3}", end='')
+        print (str(port_service))
+    # print open/filtered port status
+    elif (port_status == 'open/f'):          
+        print ('\t', end='')
+        print (colored('-', 'white', attrs=['bold']), end=' ')
+        print (f"{str(port_address):<5}", end='')
+        print (f"{'tcp':<5}", end='')
+        print (colored('[open]', 'magenta'), end='')
+        print (f"{'':<5}", end='')
+        print (str(port_service))      
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# function to validate ip address
+# if the function return NO VALUE (None) the ip address is valid
+def validate_ip_address(ip_address):
+    try:
+        explode_ip = ip_address.split('.')
+        if (len(explode_ip) < 4):
+            # invalid ip address (has no 4 blocks of numbers)
+            return 1
+        else:
+            for i in range(0, 4):
+                try:
+                    explode_ip[i] = int(explode_ip[i])
+                    if (len(str(explode_ip[i])) > 3):
+                        # invalid ip address (code fail to convert each block in int variable)
+                        return 1
+                except:
+                    # invalid ip address (has no 4 blocks)
+                    return 1
+    except:
+        # invalid ip address
+        return 1
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# error message
+def program_usage(error_message):
+    print ('usage: scadufax [-h] [-s] [-t] [-d 192.168.0.1] [-R X.X.X.1-X.X.X.254]')
+    print ('[-p 21 or 21,22,25] [--source-ip SOURCE_IP] [--source-port 443]')
+    print ('[--timeout 1-10] [--script <script>] [-i 0.1-10] [--open]')
+    print ('[-o scan_result.txt]')
+    if (error_message == ''):
+        print ('')
+    else:
+        print ('error: ' + error_message)
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+# generate service from port number
+def generate_service(port_number, protocol):
+
+    if (protocol == 'tcp'):
         try:
-            packet_code = send_packet.getlayer(TCP)
-            if 'SA' in str(packet_code):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'open', str(packet_service)
-            elif 'RA' in str(packet_code):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'closed', str(packet_service)
-        except Exception as e:
-            end_runtime = time.time() - start_runtime
-            if (int(end_runtime) >= syn_timeout):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'filtered', str(packet_service)
-            else:
+            # try to find tcp.csv on the same folder as scadufax binary
+            with open('database/tcp.csv') as tcp_content:
+                # read line by line
+                for tcp_line in tcp_content:
+                    # create port standard for compare
+                    check_port = ',' + str(port_number) + ','
+                    if check_port in tcp_line:
+                        # if port found, extract services from line
+                        checked_line = tcp_line.lower()
+                        explode_line = checked_line.split('"',)
+                        generated_service = explode_line[3]
+                        # return service name
+                        return generated_service
+        except:
+            try:
+                # try to find tcp.csv on /usr/share scadufax (installed version)
+                with open('/usr/share/scadufax/database/tcp.csv') as tcp_content:
+                    # read line by line
+                    for tcp_line in tcp_content:
+                        # create port standard for compare
+                        check_port = ',' + str(port_number) + ','
+                        if check_port in tcp_line:
+                            # if port found, extract services from line
+                            checked_line = tcp_line.lower()
+                            explode_line = checked_line.split('"',)
+                            generated_service = explode_line[3]
+                            # return service name
+                            return generated_service
+            except Exception as e:
                 print (e)
-    # FIN scan code
-    # * Send F, if returns None: Port Open/Filtered
-    # * Send F, if returns RA: Port Closed
-    elif (packet_flag == 'F'):
+
+
+    elif (protocol == 'udp'):
         try:
-            packet_code = send_packet.getlayer(TCP)
-            if 'RA' in str(packet_code):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'closed', str(packet_service)
-        except Exception as e:
-            end_runtime = time.time() - start_runtime
-            if (int(end_runtime) >= syn_timeout):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'open/f', str(packet_service)
-            else:
+            # try to find tcp.csv on the same folder as scadufax binary
+            with open('database/udp.csv') as udp_content:
+                # read line by line
+                for udp_line in udp_content:
+                    # create port standard for compare
+                    check_port = ',' + str(port_number) + ','
+                    if check_port in udp_line:
+                        # if port found, extract services from line
+                        checked_line = udp_line.lower()
+                        explode_line = checked_line.split('"',)
+                        generated_service = explode_line[3]
+                        # return service name
+                        return generated_service
+        except:
+            try:
+                # try to find tcp.csv on /usr/share scadufax (installed version)
+                with open('/usr/share/scadufax/database/udp.csv') as udp_content:
+                    # read line by line
+                    for udp_line in tcp_content:
+                        # create port standard for compare
+                        check_port = ',' + str(port_number) + ','
+                        if check_port in udp_line:
+                            # if port found, extract services from line
+                            checked_line = udp_line.lower()
+                            explode_line = checked_line.split('"',)
+                            generated_service = explode_line[3]
+                            # return service name
+                            return generated_service
+            except Exception as e:
                 print (e)
-    # NULL scan code
-    # * Send N, if returns None: Port Open/Filtered
-    # * Send N, if returns RA: Port Closed
-    elif (packet_flag == 'N'):
-        try:
-            packet_code = send_packet.getlayer(TCP)
-            if 'RA' in str(packet_code):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'closed', str(packet_service)
-        except Exception as e:
-            end_runtime = time.time() - start_runtime
-            if (int(end_runtime) >= syn_timeout):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'open/f', str(packet_service)
-            else:
-                print (e)     
-    # XMAS scan code
-    # * Send FPU, if returns None: Port Open/Filtered
-    # * Send FPU, if returns RA: Port Closed
-    elif (packet_flag == 'FPU'):
-        try:
-            packet_code = send_packet.getlayer(TCP)
-            if 'RA' in str(packet_code):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'closed', str(packet_service)
-        except Exception as e:
-            end_runtime = time.time() - start_runtime
-            if (int(end_runtime) >= syn_timeout):
-                # generate service from port number
-                packet_service = generate_service(destination_port, 'tcp')
-                # return information with port number, status and service description
-                return str(destination_port), 'open/f', str(packet_service)
-            else:
-                print (e)
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
+
+# file output function
+def output_logging(file_path, line_content):
+    try:
+        with open(file_path, 'a+') as write_line:
+            write_line.write(line_content)
+        write_line.close()
+    except Exception as e:
+        print (e)

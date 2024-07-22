@@ -506,14 +506,6 @@ def tcp_scan_multiple(scan_from, scan_to):
     # load profile configuration
     load_scadufax_profile(scan_from + '-' + scan_to, source_port_address, args.p, request_timeout)
 
-    # send parameters for task calc function
-    calculated_task = calc_task(request_timeout, interval_request, 1, len(destination_port_address))
-    time_left_message(calculated_task)
-
-    # start scanning message
-    start_scanning_message()
-
-    
 
     # if output enabled, print it into a file
     if (args.o != None):
@@ -538,8 +530,6 @@ def tcp_scan_multiple(scan_from, scan_to):
         # read ip table
     for ip_addr in range(0, len(range_target_address)):
         time.sleep(int(interval_request))
-        if (args.o != None):
-            output_logging(args.o, '\n[!] ' + str(range_target_address[ip_addr]) + '\n')
 
         # set trigger in order to not print target address multiple times
         multiple_targets_interrupter = True
@@ -561,6 +551,9 @@ def tcp_scan_multiple(scan_from, scan_to):
                     if (multiple_targets_interrupter == True):
                         printf_target(str(range_target_address[ip_addr]))
                         multiple_targets_interrupter = False
+                        # print target address 
+                        if (args.o != None):
+                            output_logging(args.o, '\n[!] ' + str(range_target_address[ip_addr]) + '\n')
 
                     printf_status(packet_port_number, packet_port_service, 'open')
                     # if output enabled, print it into a file
@@ -577,6 +570,10 @@ def tcp_scan_multiple(scan_from, scan_to):
                             printf_target(str(range_target_address[ip_addr]))
                             multiple_targets_interrupter = False
 
+                            # print target address 
+                            if (args.o != None):
+                                output_logging(args.o, '\n[!] ' + str(range_target_address[ip_addr]) + '\n')
+
                         printf_status(packet_port_number, packet_port_service, 'closed')
                         # if output enabled, print it into a file
                         if (args.o != None):
@@ -587,6 +584,10 @@ def tcp_scan_multiple(scan_from, scan_to):
                         printf_target(str(range_target_address[ip_addr]))
                         multiple_targets_interrupter = False
 
+                        # print target address 
+                        if (args.o != None):
+                            output_logging(args.o, '\n[!] ' + str(range_target_address[ip_addr]) + '\n')
+
                     printf_status(packet_port_number, packet_port_service, 'filtered')
                     # if output enabled, print it into a file
                     if (args.o != None):
@@ -596,6 +597,10 @@ def tcp_scan_multiple(scan_from, scan_to):
                     if (multiple_targets_interrupter == True):
                         printf_target(str(range_target_address[ip_addr]))
                         multiple_targets_interrupter = False
+                        
+                        # print target address 
+                        if (args.o != None):
+                            output_logging(args.o, '\n[!] ' + str(range_target_address[ip_addr]) + '\n')
 
                     printf_status(packet_port_number, packet_port_service, 'open/f')
                     if (args.o != None):

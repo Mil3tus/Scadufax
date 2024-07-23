@@ -1,4 +1,4 @@
-##### Scadufax Commands
+## Scadufax Commands
 
 usage: scadufax.py [-h] [-s S,N,F or X] [-t] [-d 192.168.0.1] [-R X.X.X.1-X.X.X.254]\
                    [-p 21 or 21,22,25] [-i 0.1-10] [-o scan_result.txt] [-source-port 443]\
@@ -6,7 +6,7 @@ usage: scadufax.py [-h] [-s S,N,F or X] [-t] [-d 192.168.0.1] [-R X.X.X.1-X.X.X.
 \
 Scadufax Network Scanner BETA
 
-options:\
+### options:\
   **-h**, **--help**            show this help message and exit\
   **-s** S,N,F or X         [S]tealth, [N]ull, [F]in, [X]mas [root required]\
   **-t**                    default tcp sanner\

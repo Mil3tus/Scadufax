@@ -4,7 +4,7 @@ usage: scadufax.py [-h] [-s S,N,F or X] [-t] [-d 192.168.0.1] [-R X.X.X.1-X.X.X.
                    [-p 21 or 21,22,25] [-i 0.1-10] [-o scan_result.txt] [-source-port 443]\
                    [-timeout 1-10] [-open]\
 \
-Scadufax Network Scanner\
+Scadufax Network Scanner
 
 options:\
   -h, --help            show this help message and exit\

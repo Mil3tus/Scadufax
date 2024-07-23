@@ -1,5 +1,5 @@
 # scadufax scanner
-# created by H1d0raKai - 2024
+# created by Mil3tus - 2024
 
 # pyinstaller compile command
 # pyinstaller -D -F -n scadufax -c scadufax.py -paths=/lib/python3/dist-packages --paths=include --onefile

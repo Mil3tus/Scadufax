@@ -1,4 +1,4 @@
-### Scadufax Commands
+##### Scadufax Commands
 
 usage: scadufax.py [-h] [-s S,N,F or X] [-t] [-d 192.168.0.1] [-R X.X.X.1-X.X.X.254]\
                    [-p 21 or 21,22,25] [-i 0.1-10] [-o scan_result.txt] [-source-port 443]\
@@ -21,12 +21,12 @@ options:\
 
   **EXAMPLES**\
 
-  ### Simple Syn Scan and a Target Only\
+  ##### Simple Syn Scan and a Target Only\
   scadufax -sS -d 192.168.0.1\
   
-  ### Scan Range of Targets and Specific Ports\
+  ##### Scan Range of Targets and Specific Ports\
   scadufax -sS -R 192.168.0.1-192.168.0.254 -p 21,22,80,443\
 
-  ### Scan Range of Targets and Specific Ports (Firewall Evasion) and Output File\
+  ##### Scan Range of Targets and Specific Ports (Firewall Evasion) and Output File\
   scadufax -sS -R 192.168.0.1-192.168.0.254 -source-port 443 -p 21,22,80 -o output_file.txt\
   

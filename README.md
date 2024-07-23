@@ -8,7 +8,9 @@ Scadufax Network Scanner BETA
 
 ### options:
   **-h**, **--help**            show this help message and exit\
-  **-s** S,N,F or X         [S]tealth, [N]ull, [F]in, [X]mas [root required]\
+
+  **-s** S,N,F or X         [**S**]tealth, [**N**]ull, [**F**]in, [**X**]mas **[root required]**\
+  
   **-t**                    default tcp sanner\
   **-d** 192.168.0.1        single target\
   **-R** X.X.X.1-X.X.X.254  range of targets\

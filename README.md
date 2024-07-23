@@ -55,4 +55,9 @@ Scadufax Network Scanner BETA
   ##### Scan target and specify a interval between requests (3 seconds)
    ``` 
   scadufax -sS -d 192.168.0.1 -i 3
+   ```
+  ##### Scan a range of targets (Null Scan)
    ``` 
+  scadufax -sN -R 192.168.0.1-192.168.0.10 -p 21,22,53,3306
+   ```
+

@@ -19,20 +19,20 @@ options:\
   **-timeout** 1-10         set request timeout\
   **-open**                 show open ports only\
 
-  **EXAMPLES**\
+  **EXAMPLES**
 
-  ##### Simple syn scan and a target only\
-  scadufax -sS -d 192.168.0.1\
+  ##### Simple syn scan and a target only
+  scadufax -sS -d 192.168.0.1
   
-  ##### Scan range of targets and specific port list\
-  scadufax -sS -R 192.168.0.1-192.168.0.254 -p 21,22,80,443\
+  ##### Scan range of targets and specific port list
+  scadufax -sS -R 192.168.0.1-192.168.0.254 -p 21,22,80,443
 
   ##### Scan tange of targets and specific ports (Firewall Evasion) and output file\
-  scadufax -sS -R 192.168.0.1-192.168.0.254 -source-port 443 -p 21,22,80 -o output_file.txt\
+  scadufax -sS -R 192.168.0.1-192.168.0.254 -source-port 443 -p 21,22,80 -o output_file.txt
   
-  ##### Scan range of targets show only open ports \
+  ##### Scan range of targets show only open ports\
   scadufax -sS -R 192.168.0.1-192.168.0.254 -open\
   
-  ##### Scan target and specify a interval between requests (3 seconds) \
+  ##### Scan target and specify a interval between requests (3 seconds)\
   scadufax -sS -d 192.168.0.1 -i 3\
   

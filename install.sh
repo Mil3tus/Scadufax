@@ -10,7 +10,7 @@ echo "[+] folder created"
 sleep 0.5
 echo "[+] decompressing files"
 # uncompress
-tar -C temp -xf scadufax.beta_noudp.tar.gz
+tar -C temp -xf scadufax.tar.gz
 sleep 0.5
 echo "[+] copying binary to /usr/bin/"
 cp temp/scadufax /usr/bin/scadufax

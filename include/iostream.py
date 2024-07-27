@@ -74,7 +74,7 @@ def load_scadufax_profile(target_address, source_port, destination_port, request
     top_ports_default_scanner = '1,3,4,6,7,9,13,17,19,20,21,22,23,24,25,26,32,' + \
     '33,37,42,43,49,53,70,80,135,137,139,443,445,458,464,464,481,497,' + \
     '500,512,515,524,2020,2121,2222,2323,2424,2525,3005,3006,3007,3031,3052,' + \
-    '3306,4443,4550,4567,4662,5288,8080,8081,8082,8083,8084'
+    '3306,4443,4550,4567,4662,5288,8080,8081,8082,8083,8084,62078'
     
     
     time.sleep(1)
@@ -142,6 +142,12 @@ def printf_target(target_address):
     print (colored('!', 'yellow', attrs=['bold']), end='')
     print ('] ' + str(target_address))
 
+
+# print host is down
+def printf_hostdown(target_address):
+    print ('\n[', end='')
+    print (colored('offline', 'red', attrs=['bold']), end='')
+    print ('] ' + str(target_address))
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -285,7 +291,7 @@ def generate_service(port_number, protocol):
                 # try to find tcp.csv on /usr/share scadufax (installed version)
                 with open('/usr/share/scadufax/database/udp.csv') as udp_content:
                     # read line by line
-                    for udp_line in tcp_content:
+                    for udp_line in udp_content:
                         # create port standard for compare
                         check_port = ',' + str(port_number) + ','
                         if check_port in udp_line:

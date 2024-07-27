@@ -1,6 +1,18 @@
 # network module
 # created by Mil3tus
 
+#Default TTL and Hop Limit values vary between different operating systems, here are the defaults for a few:
+
+# Linux kernel 2.4 (circa 2001): 255 for TCP, UDP and ICMP
+# Linux kernel 4.10 (2015): 64 for TCP, UDP and ICMP
+# Windows XP (2001): 128 for TCP, UDP and ICMP
+# Windows 10 (2015): 128 for TCP, UDP and ICMP
+# Windows Server 2008: 128 for TCP, UDP and ICMP
+# Windows Server 2019 (2018): 128 for TCP, UDP and ICMP
+# MacOS (2001): 64 for TCP, UDP and ICMP
+
+
+
 # required libraries syn scan function
 from logging import getLogger, ERROR # import logging things
 getLogger("scapy.runtime").setLevel(ERROR) # get rid if ipv6 packet
@@ -19,10 +31,13 @@ conf.verb = 0
 
 # send ICMP packet in order to show if host is alive or not
 def icmp_send_packet(target_address, icmp_timeout):
+    # send ICMP packet
     icmp_packet = sr1(IP(dst = target_address)/ICMP(), timeout = icmp_timeout)
     if (icmp_packet != None):
+        # host is alive :)
         return True
     else:
+        # host is dead :(
         return False
 
 
@@ -32,7 +47,6 @@ def icmp_send_packet(target_address, icmp_timeout):
 
 # three way handshake connection function (TCP Protocol)
 def tcp_send_packet(target_address, source_port, destination_port, socket_timeout):
-    # create a ftp connection
     start_runtime = time.time()
     socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this line of code solve this error ([Errno 98] Address already in use)
@@ -62,27 +76,27 @@ def tcp_send_packet(target_address, source_port, destination_port, socket_timeou
             return str(destination_port), 'closed', str(packet_service)
         
         
-    
 
 
-# three way handshake connection function (UDP Protocol)
-def udp_send_packet(target_address, source_port, destination_port, socket_timeout):
-    start_runtime = time.time()
-    socket1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    socket1.settimeout(socket_timeout)
+        
+
+def udp_send_packet(source_address, target_address, source_port, destination_port, syn_timeout):
     try:
-        socket1.bind(('', destination_port))
-        socket1.connect((target_address, destination_port))
-        packet_service = generate_service(destination_port, 'tcp')
-        return str(destination_port), 'open', str(packet_service)
-    except Exception as e:
-        end_runtime = time.time() - start_runtime
-        if (int(end_runtime) == socket_timeout):
-            packet_service = generate_service(destination_port, 'tcp')
-            return str(destination_port), 'filtered', str(packet_service)
-        else:
-            packet_service = generate_service(destination_port, 'tcp')
+        # send udp packet
+        send_packet = sr1(IP(dst = target_address)/UDP(sport = source_port,
+        dport = int(destination_port)), timeout = syn_timeout) # built SYN packet
+        packet_code = send_packet.getlayer(UDP)
+        # 
+        if (packet_code == None):
+            # generate service from port number
+            packet_service = generate_service(destination_port, 'udp')
+            # return information with port number, status and service description
             return str(destination_port), 'closed', str(packet_service)
+    except Exception as e:
+            # generate service from port number
+            packet_service = generate_service(destination_port, 'udp')
+            # return information with port number, status and service description
+            return str(destination_port), 'open/f', str(packet_service)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -116,7 +130,6 @@ def generate_ip_range(scan_from, scan_to):
                 temp[i-1] += 1
         ip_range.append(".".join(map(str, temp)))
     return ip_range
-
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -216,3 +229,4 @@ def send_flag_prototype(source_address, target_address, source_port, destination
                 return str(destination_port), 'open/f', str(packet_service)
             else:
                 print (e)
+

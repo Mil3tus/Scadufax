@@ -28,7 +28,6 @@ conf.verb = 0
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
-
 # send ICMP packet in order to show if host is alive or not
 def icmp_send_packet(target_address, icmp_timeout):
     # send ICMP packet
@@ -40,10 +39,7 @@ def icmp_send_packet(target_address, icmp_timeout):
         # host is dead :(
         return False
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 # three way handshake connection function (TCP Protocol)
 def tcp_send_packet(target_address, source_port, destination_port, socket_timeout):
@@ -75,11 +71,6 @@ def tcp_send_packet(target_address, source_port, destination_port, socket_timeou
             socket1.close()
             return str(destination_port), 'closed', str(packet_service)
         
-        
-
-
-        
-
 def udp_send_packet(source_address, target_address, source_port, destination_port, syn_timeout):
     try:
         # send udp packet
@@ -98,9 +89,7 @@ def udp_send_packet(source_address, target_address, source_port, destination_por
             # return information with port number, status and service description
             return str(destination_port), 'open/f', str(packet_service)
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # function to generate a random value from source port
 # when the user doesn't use the --source-port flag
@@ -111,9 +100,7 @@ def random_source_port():
     source_port = random.choice(source_port_random)
     return source_port
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # generate ip list (from: 192.168.0.1 to: 192.168.0.254)
 def generate_ip_range(scan_from, scan_to):
@@ -131,10 +118,7 @@ def generate_ip_range(scan_from, scan_to):
         ip_range.append(".".join(map(str, temp)))
     return ip_range
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 # send flag funtion prototype
 def send_flag_prototype(source_address, target_address, source_port, destination_port, syn_timeout, packet_flag):

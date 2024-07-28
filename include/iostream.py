@@ -48,10 +48,7 @@ def calc_task(request_timeout, interval_request, address_pool, port_pool):
         time_calc = time_calc
         return str("{:.1f}".format(time_calc)) + ' seconds left'
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 # scadufax scanner banner
 def scadufax_banner():
@@ -66,7 +63,6 @@ def scadufax_banner():
     print ('\n\n')
 
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # show scadufax profile scanning
 def load_scadufax_profile(target_address, source_port, destination_port, request_timeout):
@@ -99,10 +95,7 @@ def load_scadufax_profile(target_address, source_port, destination_port, request
     print (colored('>', 'cyan', attrs=['bold']), end='')
     print ('] request timeout: ' + str(request_timeout))
 
-
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # time left message
 def time_left_message(time_value):
@@ -110,9 +103,7 @@ def time_left_message(time_value):
     print (colored('+', 'red', attrs=['bold']), end='')
     print ('] estimated task time [ ' + str(time_value) + ' ]')
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # start scanning message
 def start_scanning_message():
@@ -121,9 +112,7 @@ def start_scanning_message():
     print (colored('*', 'green', attrs=['bold']), end='')
     print ('] start scanning [' + str(datetime.datetime.now()) + ']')
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # start scanning message
 def finish_scanning_message():
@@ -132,16 +121,13 @@ def finish_scanning_message():
     print (colored('*', 'light_cyan', attrs=['bold']), end='')
     print ('] task finished [' + str(datetime.datetime.now()) + ']\n')
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # show target address on screen
 def printf_target(target_address):
     print ('\n[', end='')
     print (colored('!', 'yellow', attrs=['bold']), end='')
     print ('] ' + str(target_address))
-
 
 # print host is down
 def printf_hostdown(target_address):
@@ -150,7 +136,6 @@ def printf_hostdown(target_address):
     print ('] ' + str(target_address))
 
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 def printf_status(port_address, port_service, port_status):
     # print open port status
@@ -192,7 +177,6 @@ def printf_status(port_address, port_service, port_status):
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
-
 # function to validate ip address
 # if the function return NO VALUE (None) the ip address is valid
 def validate_ip_address(ip_address):
@@ -215,9 +199,7 @@ def validate_ip_address(ip_address):
         # invalid ip address
         return 1
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # error message
 def program_usage(error_message):
@@ -229,8 +211,6 @@ def program_usage(error_message):
         print ('')
     else:
         print ('error: ' + error_message)
-
-
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -304,9 +284,7 @@ def generate_service(port_number, protocol):
             except Exception as e:
                 print (e)
 
-
 #-------------------------------------------------------------------------------------------------------------------------------------
-
 
 # file output function
 def output_logging(file_path, line_content):

@@ -5,6 +5,11 @@ i pretend to implement UDP protocol support.
 **IMPORTANT:** SYN/XMAS/NULL/FIN Scan doesn't work with *proxychains* tool, and require
 root mode to work.
 
+**Compiling Code with Pyinstaller**
+
+```
+pyinstaller -D -F -n scadufax -c scadufax.py -paths=/lib/python3/dist-packages --paths=include --onefile
+```
 
   **EXAMPLES**
 

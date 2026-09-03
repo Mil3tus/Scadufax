@@ -164,8 +164,6 @@ During the scan, detected ports are matched against these databases to display h
 
 Scadufax uses **Termcolor** to provide a clean and colorized terminal interface, making scan results easier to read.
 
-*(Add one or more screenshots here.)*
-
 ---
 
 # How It Works
